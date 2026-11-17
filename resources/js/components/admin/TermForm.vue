@@ -3,6 +3,7 @@ import { Link, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import Field from '@/components/admin/Field.vue';
 import IdgiScore from '@/components/admin/IdgiScore.vue';
+import PronunciationRecorder from '@/components/admin/PronunciationRecorder.vue';
 import RichTextEditor from '@/components/admin/RichTextEditor.vue';
 import TermTextarea from '@/components/admin/TermTextarea.vue';
 import { Button } from '@/components/ui/button';
@@ -57,7 +58,7 @@ const textFields: TextField[] = [
     'definition',
     'explanation',
     'common_variants',
-    'audio_clip',
+    'pronunciation',
     'video',
     'test',
     'cartoon',
@@ -171,10 +172,12 @@ const errorCount = computed(() => Object.keys(form.errors).length);
                     />
                 </Field>
 
+                <!-- The hint sits below, so this box lines up with the term box beside it. -->
                 <Field
                     id="term_ordered"
                     :label="t('term-ordered')"
                     hint="Only if it should also be filed under another word, such as “risk, absolute”."
+                    hint-below
                     :error="form.errors.term_ordered"
                 >
                     <template #default="{ describedby }">
@@ -187,6 +190,22 @@ const errorCount = computed(() => Object.keys(form.errors).length);
                     </template>
                 </Field>
             </div>
+
+            <Field
+                id="pronunciation"
+                :label="t('pronunciation')"
+                :hint="t('pronunciation-hint')"
+                :error="form.errors.pronunciation"
+            >
+                <template #default="{ describedby, invalid }">
+                    <PronunciationRecorder
+                        id="pronunciation"
+                        v-model="form.pronunciation"
+                        :describedby="describedby"
+                        :invalid="invalid"
+                    />
+                </template>
+            </Field>
 
             <Field
                 id="definition"
@@ -251,11 +270,13 @@ const errorCount = computed(() => Object.keys(form.errors).length);
                 </div>
             </details>
 
+            <!-- Hints below, so the two boxes line up whatever the hints' lengths. -->
             <div class="grid gap-6 sm:grid-cols-2">
                 <Field
                     id="synonyms"
                     :label="t('synonyms')"
                     hint="Separate with semicolons. Start one with !! to mark it as not recommended."
+                    hint-below
                     :error="form.errors.synonyms"
                 >
                     <template #default="{ describedby }">
@@ -272,6 +293,7 @@ const errorCount = computed(() => Object.keys(form.errors).length);
                     id="common_variants"
                     :label="t('common-variants')"
                     :hint="t('separate-terms')"
+                    hint-below
                     :error="form.errors.common_variants"
                 >
                     <template #default="{ describedby }">
@@ -352,43 +374,23 @@ const errorCount = computed(() => Object.keys(form.errors).length);
                 </template>
             </Field>
 
-            <div class="grid gap-6 sm:grid-cols-2">
-                <Field
-                    id="video"
-                    :label="t('video')"
-                    hint="Paste the embed code from Vimeo or YouTube."
-                    :error="form.errors.video"
-                >
-                    <template #default="{ describedby }">
-                        <textarea
-                            id="video"
-                            v-model="form.video"
-                            rows="4"
-                            spellcheck="false"
-                            :aria-describedby="describedby"
-                            class="block w-full rounded-md border border-input bg-card px-3 py-2 font-mono text-sm"
-                        ></textarea>
-                    </template>
-                </Field>
-
-                <Field
-                    id="audio_clip"
-                    :label="t('audio-clip')"
-                    :hint="t('paste-soundcloud')"
-                    :error="form.errors.audio_clip"
-                >
-                    <template #default="{ describedby }">
-                        <textarea
-                            id="audio_clip"
-                            v-model="form.audio_clip"
-                            rows="4"
-                            spellcheck="false"
-                            :aria-describedby="describedby"
-                            class="block w-full rounded-md border border-input bg-card px-3 py-2 font-mono text-sm"
-                        ></textarea>
-                    </template>
-                </Field>
-            </div>
+            <Field
+                id="video"
+                :label="t('video')"
+                hint="Paste the embed code from Vimeo or YouTube."
+                :error="form.errors.video"
+            >
+                <template #default="{ describedby }">
+                    <textarea
+                        id="video"
+                        v-model="form.video"
+                        rows="4"
+                        spellcheck="false"
+                        :aria-describedby="describedby"
+                        class="block w-full rounded-md border border-input bg-card px-3 py-2 font-mono text-sm"
+                    ></textarea>
+                </template>
+            </Field>
 
             <Field
                 id="test"

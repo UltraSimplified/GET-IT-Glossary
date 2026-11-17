@@ -72,7 +72,8 @@ export type TermEntry = {
     warning_html: string;
     see_also: TermLink[];
     tags: string[];
-    audio_track: string | null;
+    /** Public path of a recording of the term said aloud. */
+    pronunciation: string | null;
 };
 
 export type TermComment = {

@@ -13,8 +13,11 @@ export function useTranslations() {
     function t(key: string, replace: Record<string, string | number> = {}) {
         let line = page.props.translations?.[key] ?? key;
 
-        for (const [name, value] of Object.entries(replace)) {
-            line = line.replaceAll(`:${name}`, String(value));
+        // Longest names first, so :beat can't eat the start of :beats.
+        const names = Object.keys(replace).sort((a, b) => b.length - a.length);
+
+        for (const name of names) {
+            line = line.replaceAll(`:${name}`, String(replace[name]));
         }
 
         return line;

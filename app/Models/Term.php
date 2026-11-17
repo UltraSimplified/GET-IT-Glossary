@@ -37,7 +37,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $definition
  * @property string|null $explanation
  * @property string|null $common_variants
- * @property string|null $audio_clip
+ * @property string|null $audio_clip Old SoundCloud embed code, no longer shown.
+ * @property string|null $pronunciation Public path of a recording of the term said aloud.
  * @property string|null $video
  * @property string|null $test
  * @property string|null $cartoon
@@ -53,7 +54,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'master_id', 'term', 'term_ordered', 'term_status', 'do_not_use', 'warning',
     'tags', 'see_also', 'links', 'synonyms', 'definition', 'explanation',
-    'common_variants', 'audio_clip', 'video', 'test', 'cartoon', 'example',
+    'common_variants', 'audio_clip', 'pronunciation', 'video', 'test', 'cartoon', 'example',
     'hits', 'IDGI', 'enabled', 'version', 'updated_by',
 ])]
 class Term extends Model

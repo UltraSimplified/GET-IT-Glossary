@@ -54,7 +54,7 @@ class TermPresenter
             'warning_html' => (string) $term->warning,
             'see_also' => self::seeAlso($term->see_also),
             'tags' => self::tags($term->tags),
-            'audio_track' => self::audioTrack($term->audio_clip),
+            'pronunciation' => $term->pronunciation,
         ];
     }
 
@@ -129,17 +129,5 @@ class TermPresenter
             array_map('trim', explode(',', (string) $tags)),
             fn (string $tag) => $tag !== '',
         ));
-    }
-
-    /**
-     * Pull the numeric track id out of a pasted SoundCloud embed code.
-     */
-    public static function audioTrack(?string $embed): ?string
-    {
-        if (blank($embed)) {
-            return null;
-        }
-
-        return preg_match('/\/(\d+)/', $embed, $matches) ? $matches[1] : null;
     }
 }

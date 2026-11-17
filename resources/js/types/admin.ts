@@ -34,7 +34,7 @@ export type TermFields = {
     definition: string | null;
     explanation: string | null;
     common_variants: string | null;
-    audio_clip: string | null;
+    pronunciation: string | null;
     video: string | null;
     test: string | null;
     cartoon: string | null;

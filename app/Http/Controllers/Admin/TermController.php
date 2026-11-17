@@ -113,7 +113,7 @@ class TermController extends TermAdminController
                 ...$term->only([
                     'id', 'master_id', 'term', 'term_ordered', 'term_status', 'do_not_use',
                     'see_also', 'synonyms', 'warning', 'definition', 'explanation',
-                    'common_variants', 'audio_clip', 'video', 'test', 'cartoon', 'example', 'version',
+                    'common_variants', 'pronunciation', 'video', 'test', 'cartoon', 'example', 'version',
                 ]),
                 'tags' => TermPresenter::tags($term->tags),
                 'path' => $term->path(),

@@ -4,7 +4,9 @@ import {
     BookOpenText,
     ChevronDown,
     FileText,
+    Globe,
     LogOut,
+    Palette,
     Settings,
     Users,
 } from '@lucide/vue';
@@ -64,6 +66,20 @@ const user = computed(() => page.props.auth.user);
                     {{ t('manage-terms') }}
                 </Link>
             </DropdownMenuItem>
+            <template v-if="user.is_admin">
+                <DropdownMenuItem as-child>
+                    <Link href="/site" class="w-full cursor-pointer">
+                        <Globe class="size-4" aria-hidden="true" />
+                        {{ t('manage-site') }}
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem as-child>
+                    <Link href="/themes" class="w-full cursor-pointer">
+                        <Palette class="size-4" aria-hidden="true" />
+                        {{ t('manage-themes') }}
+                    </Link>
+                </DropdownMenuItem>
+            </template>
             <DropdownMenuSeparator />
             <DropdownMenuItem as-child>
                 <Link :href="editProfile()" class="w-full cursor-pointer">

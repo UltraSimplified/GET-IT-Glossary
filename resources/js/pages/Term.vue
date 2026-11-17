@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { ArrowLeft, ArrowRight, CirclePlay, SquarePen } from '@lucide/vue';
+import { ArrowLeft, ArrowRight, SquarePen, Volume2 } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import CommentForm from '@/components/glossary/CommentForm.vue';
 import CommentList from '@/components/glossary/CommentList.vue';
@@ -27,12 +27,36 @@ const italicDefinition = computed(
     () => page.props.theme.definition_style === 'italic-dash',
 );
 
-const playing = ref(false);
+// The term said aloud, recorded in the term editor.
+const pronunciation = ref<HTMLAudioElement | null>(null);
+const speaking = ref(false);
+const cannotPlay = ref(false);
+
+async function sayIt() {
+    const audio = pronunciation.value;
+
+    if (!audio) {
+        return;
+    }
+
+    cannotPlay.value = false;
+    audio.currentTime = 0;
+
+    try {
+        await audio.play();
+    } catch {
+        // Some browsers can't play the format the recording was made in.
+        cannotPlay.value = true;
+    }
+}
 
 // The page component is reused when moving between terms.
 watch(
     () => props.term?.id,
-    () => (playing.value = false),
+    () => {
+        speaking.value = false;
+        cannotPlay.value = false;
+    },
 );
 </script>
 
@@ -83,23 +107,67 @@ watch(
             <div>
                 <header>
                     <div class="flex items-start gap-4">
-                        <h1
-                            class="flex-1 text-3xl font-bold text-balance text-ink md:text-4xl"
+                        <div
+                            class="flex flex-1 flex-wrap items-center gap-x-3 gap-y-2"
                         >
-                            <a
-                                v-if="term.do_not_use"
-                                href="#warning"
-                                :title="t('not-recommended')"
-                                class="mr-1"
+                            <h1
+                                class="text-3xl font-bold text-balance text-ink md:text-4xl"
                             >
-                                <span
-                                    class="warn-mark"
-                                    role="img"
-                                    :aria-label="t('not-recommended')"
-                                ></span>
-                            </a>
-                            {{ term.term }}
-                        </h1>
+                                <a
+                                    v-if="term.do_not_use"
+                                    href="#warning"
+                                    :title="t('not-recommended')"
+                                    class="mr-1"
+                                >
+                                    <span
+                                        class="warn-mark"
+                                        role="img"
+                                        :aria-label="t('not-recommended')"
+                                    ></span>
+                                </a>
+                                {{ term.term }}
+                            </h1>
+
+                            <template v-if="term.pronunciation">
+                                <button
+                                    type="button"
+                                    class="inline-flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-primary text-ink transition-colors hover:bg-brand-soft"
+                                    :class="{ 'bg-brand-soft': speaking }"
+                                    :aria-label="
+                                        t('hear-pronunciation', {
+                                            term: term.term,
+                                        })
+                                    "
+                                    :title="
+                                        t('hear-pronunciation', {
+                                            term: term.term,
+                                        })
+                                    "
+                                    data-test="say-it"
+                                    @click="sayIt"
+                                >
+                                    <Volume2
+                                        class="size-5"
+                                        aria-hidden="true"
+                                    />
+                                </button>
+                                <audio
+                                    ref="pronunciation"
+                                    :src="term.pronunciation"
+                                    preload="none"
+                                    @play="speaking = true"
+                                    @pause="speaking = false"
+                                    @ended="speaking = false"
+                                ></audio>
+                                <p
+                                    v-if="cannotPlay"
+                                    role="status"
+                                    class="w-full text-sm text-muted-foreground"
+                                >
+                                    {{ t('pronunciation-cannot-play') }}
+                                </p>
+                            </template>
+                        </div>
 
                         <Link
                             v-if="canEdit"
@@ -121,25 +189,6 @@ watch(
                             >—&nbsp;</span
                         ><RichHtml as="span" :html="term.definition_html" />
                     </p>
-
-                    <div v-if="term.audio_track" class="mt-5">
-                        <button
-                            v-if="!playing"
-                            type="button"
-                            class="inline-flex items-center gap-2 rounded-full border-2 border-primary px-4 py-1.5 text-sm font-semibold text-ink hover:bg-brand-soft"
-                            @click="playing = true"
-                        >
-                            <CirclePlay class="size-5" aria-hidden="true" />
-                            {{ t('play-audio') }}
-                        </button>
-                        <iframe
-                            v-else
-                            :title="t('play-audio')"
-                            :src="`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${term.audio_track}&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&color=%2316306b`"
-                            class="h-28 w-full rounded-md border-0"
-                            allow="autoplay"
-                        ></iframe>
-                    </div>
                 </header>
 
                 <section v-if="term.synonyms_html" class="mt-9">

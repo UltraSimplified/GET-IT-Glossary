@@ -29,7 +29,8 @@ class TermRequest extends FormRequest
             'definition' => ['required', 'string'],
             'explanation' => ['nullable', 'string'],
             'common_variants' => ['nullable', 'string'],
-            'audio_clip' => ['nullable', 'string'],
+            // A recording uploaded by the term editor, never an address from elsewhere.
+            'pronunciation' => ['nullable', 'string', 'max:255', 'regex:#^/uploads/pronunciations/[A-Za-z0-9._-]+$#'],
             'video' => ['nullable', 'string'],
             'test' => ['nullable', 'string'],
             'cartoon' => ['nullable', 'string'],
@@ -38,6 +39,16 @@ class TermRequest extends FormRequest
             'editors.*' => ['integer', 'exists:users,id'],
             // "update" overwrites this version; "version" keeps it as history and saves a new one.
             'mode' => ['sometimes', Rule::in(['update', 'version'])],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'pronunciation.regex' => 'Record the pronunciation again: the recording could not be found.',
         ];
     }
 

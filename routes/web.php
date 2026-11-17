@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ChooseThemeController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
+use App\Http\Controllers\Admin\PronunciationUploadController;
 use App\Http\Controllers\Admin\SiteController;
 use App\Http\Controllers\Admin\TermController as AdminTermController;
 use App\Http\Controllers\Admin\TermVersionController;
@@ -99,6 +100,7 @@ Route::middleware('auth')->group(function () {
     Route::put('terms/{term}', [AdminTermController::class, 'update'])->name('terms.update');
 
     Route::post('upload', UploadController::class)->middleware('can:upload')->name('upload');
+    Route::post('upload/pronunciation', PronunciationUploadController::class)->middleware('can:upload')->name('upload.pronunciation');
 
     Route::middleware('can:admin')->group(function () {
         Route::resource('pages', AdminPageController::class);
