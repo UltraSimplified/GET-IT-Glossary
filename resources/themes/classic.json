@@ -1,0 +1,43 @@
+{
+    "name": "Classic",
+    "description": "The original GET-IT look: dark grey on white with dark blue links, set in Sirba from the site's Adobe Fonts kit (Source Serif 4 without it), with square letters and definitions in italic after a dash.",
+    "settings": {
+        "version": 1,
+        "colours": {
+            "light": {
+                "background": "#ffffff",
+                "surface": "#f8f8f8",
+                "text": "#333333",
+                "muted_text": "#707070",
+                "border": "#dddddd",
+                "link": "#00008b",
+                "primary": "#00008b",
+                "primary_text": "#ffffff",
+                "accent": "#00008b",
+                "highlight": "#ffef9c",
+                "highlight_text": "#333333"
+            },
+            "dark": null
+        },
+        "accents": ["#00008b"],
+        "fonts": {
+            "body": {
+                "family": "sirba-web",
+                "source": "site",
+                "fallback": "Source Serif 4"
+            },
+            "heading": {
+                "family": "sirba-web",
+                "source": "site",
+                "fallback": "Source Serif 4"
+            }
+        },
+        "base_size": 16,
+        "radius": 4,
+        "logo": "/assets/themes/classic/logo.png",
+        "letter_shape": "square",
+        "home_alphabet": "row",
+        "definition_style": "italic-dash",
+        "letter_colours": "single"
+    }
+}

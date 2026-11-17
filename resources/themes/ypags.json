@@ -1,0 +1,43 @@
+{
+    "name": "YPAGS",
+    "description": "The classic layout in the Generation R colours from the pink hand logo, set in Source Sans, with each letter of the alphabet taking the next colour in turn.",
+    "settings": {
+        "version": 1,
+        "colours": {
+            "light": {
+                "background": "#ffffff",
+                "surface": "#f8f8f8",
+                "text": "#333333",
+                "muted_text": "#707070",
+                "border": "#dddddd",
+                "link": "#b33174",
+                "primary": "#b33174",
+                "primary_text": "#ffffff",
+                "accent": "#da3c8d",
+                "highlight": "#f9e843",
+                "highlight_text": "#333333"
+            },
+            "dark": null
+        },
+        "accents": ["#c93782", "#6cc7ee", "#bacf2d", "#f9b53d", "#f9e843"],
+        "fonts": {
+            "body": {
+                "family": "Source Sans 3",
+                "source": "bundled",
+                "fallback": "Source Sans 3"
+            },
+            "heading": {
+                "family": "Source Sans 3",
+                "source": "bundled",
+                "fallback": "Source Sans 3"
+            }
+        },
+        "base_size": 18,
+        "radius": 4,
+        "logo": "/assets/themes/ypags/logo.png",
+        "letter_shape": "square",
+        "home_alphabet": "row",
+        "definition_style": "italic-dash",
+        "letter_colours": "cycle"
+    }
+}

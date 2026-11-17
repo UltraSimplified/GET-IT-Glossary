@@ -1,0 +1,55 @@
+{
+    "name": "AIM",
+    "description": "Navy, teal and yellow from the AIM logo, Atkinson Hyperlegible, hexagon letters and the honeycomb alphabet.",
+    "settings": {
+        "version": 1,
+        "colours": {
+            "light": {
+                "background": "#f5f8fa",
+                "surface": "#ffffff",
+                "text": "#1b2540",
+                "muted_text": "#52607a",
+                "border": "#d3dde4",
+                "link": "#16306b",
+                "primary": "#16306b",
+                "primary_text": "#ffffff",
+                "accent": "#0f757c",
+                "highlight": "#f5cf6b",
+                "highlight_text": "#1b2540"
+            },
+            "dark": {
+                "background": "#0d1630",
+                "surface": "#131f43",
+                "text": "#e7edf7",
+                "muted_text": "#a4b2cd",
+                "border": "#283a6f",
+                "link": "#cfe0ff",
+                "primary": "#8ad4d9",
+                "primary_text": "#0d1630",
+                "accent": "#7fd2d7",
+                "highlight": "#f5cf6b",
+                "highlight_text": "#1b2540"
+            }
+        },
+        "accents": ["#0f757c", "#16306b"],
+        "fonts": {
+            "body": {
+                "family": "Atkinson Hyperlegible Next",
+                "source": "bundled",
+                "fallback": "Atkinson Hyperlegible Next"
+            },
+            "heading": {
+                "family": "Atkinson Hyperlegible Next",
+                "source": "bundled",
+                "fallback": "Atkinson Hyperlegible Next"
+            }
+        },
+        "base_size": 16,
+        "radius": 8,
+        "logo": "/assets/img/aimlogo.png",
+        "letter_shape": "hexagon",
+        "home_alphabet": "honeycomb",
+        "definition_style": "plain",
+        "letter_colours": "single"
+    }
+}

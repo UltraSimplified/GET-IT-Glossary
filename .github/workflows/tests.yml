@@ -1,0 +1,77 @@
+name: Test
+
+# Every check runs on each push to main and on each pull request, in the order
+# a failure is cheapest to read: formatting, front-end lint and types, static
+# analysis, then the test suite.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch makes an older run pointless.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: '8.5'
+  NODE_VERSION: '24'
+  PHP_EXTENSIONS: intl, pdo_sqlite, zip
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          tools: composer:v2
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare the application
+        run: |
+          cp .env.example .env
+          php artisan key:generate --no-interaction
+
+      # The build also writes the typed route helpers (resources/js/routes and
+      # actions) that the type check below needs.
+      - name: Build the front end
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: Check PHP formatting
+        run: composer test:lint
+
+      - name: Lint and type-check the front end
+        run: |
+          npm run check
+          npm run types:check
+
+      # Larastan, then Sloppy against .sloppy-baseline.json.
+      - name: Static analysis
+        run: composer analyse
+
+      - name: Feature and unit tests
+        run: php artisan test --compact

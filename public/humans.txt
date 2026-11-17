@@ -1,0 +1,54 @@
+/* WEB TEAM */
+
+	Name: Douglas Badenoch
+	Role: Project Lead
+	Contact: douglas.badenoch [at] minervation.com
+	Twitter: @dbadenoch
+	Location: Edinburgh, UK
+
+	Name: Robin Layfield
+	Role: Lead Developer
+	Contact: robin [at] ultrasimplified.com
+	Twitter: @robinlayfield
+	Location: Stroud, UK
+
+	Name: Tom Brooks
+	Role: WordPress developer
+	Contact: tom [at] olospo.co.uk
+	Location: Oxford, UK
+	
+/* GET-IT TEAM */
+
+	Name: Andy Oxman
+	Role: UX
+
+	Name: Sarah Rosenbaum
+  Role: UX
+  
+  Name: Astrid Austvoll-Dahlgren
+  Role: Test development
+  
+  Name: Robin Harbour
+  Role: Test development
+  
+  Name: Shaun Treweek
+  Role: Test development
+  
+  Name: H Maclehose
+  
+  Name: Iain Chalmers
+  Role: Content producer
+  
+  Name: Patricia Atkinson
+  Role: Content editor
+  
+  Name: Pablo Alonso
+  Name: Ulysses Panisset
+  Name: Jenny Moberg
+    
+/* SITE */
+	Last update:2015/02/17
+	Language: English
+	Doctype:HTML5, CSS3
+	Components:Laravel5, MySQL, jQuery, Bootstrap
+	Software: Coda, Laravel5, Basecamp, Photoshop, Heroku, CodeKit, Sketch

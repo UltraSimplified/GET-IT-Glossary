@@ -1,0 +1,84 @@
+schema: spec-driven
+
+# Constraints an agent cannot infer by reading the code. The repository is
+# public, so nothing here names hosts, addresses, credentials or people.
+context: |
+  GET-IT Glossary is a plain-language glossary of health research terms. One
+  codebase serves several language editions (APP_LOCALE, GLOSSARY_INSTANCE).
+  The repository is public: artifacts never name hosts, IP addresses,
+  credentials or personal details, and never quote real users or real data.
+
+  Naming. The "glossary" is the public site: A-Z listings, term pages,
+  search, top ten, content pages and the contact forms. The "admin screens"
+  are /terms, /pages and /users. Administrators manage everything; editors
+  change only the terms assigned to them; contributors can comment.
+
+  Versions. Every saved version of a term is its own row. Rows of one term
+  share a master_id (the id of version 1), older rows have the status
+  REVISION, and editor assignments point at the master_id. "Update this
+  version" overwrites a row; "Save as a new version" keeps it as history.
+
+  Addresses and embeds are a public contract. Other websites, a WordPress
+  plugin and search engines rely on /term/{name with + for spaces},
+  /listing/{letter}, /search/{query}, the /about, /the-api and /get-in-touch
+  pages, /widget and the /v1 API. Never change these URLs or the /v1 response
+  shapes; add, don't alter.
+
+  Content. Term text and page bodies are HTML written by trusted editors and
+  shown as HTML. In term text, [term] and [words|term] link to other terms and
+  "!!" marks a word as not recommended. Definitions stay inline text with no
+  <p>, because the API and widget hand them to other sites. Comments are plain
+  text. Opening and saving a record without changing it must leave its HTML
+  byte-for-byte as it was.
+
+  Language. Interface text lives in lang/{locale}/interface.php and reaches
+  Vue through useTranslations(). New strings go in lang/en; other editions
+  fall back to English until translated.
+
+  Data. The local SQLite database holds a copy of the live glossary loaded
+  with php artisan glossary:import, including real accounts. Never run
+  migrate:fresh, db:seed or the import against it without asking. The tests
+  run on in-memory SQLite and are safe. Production runs MySQL or MariaDB, so
+  search and term lookups must work on both (full-text search on MySQL, LIKE
+  on SQLite; term names compare without regard to case).
+
+  _legacy/ is the original Laravel 5 site, kept only for reference and
+  ignored by git. Never edit it, and never run a formatter or analyser over it.
+
+  Design. Colours, type and spacing come from the tokens in
+  resources/css/app.css. Every screen works at phone width with no sideways
+  scrolling, keeps a visible keyboard focus and respects reduced motion.
+
+  Git. Agents never commit or push: the maintainer commits so that
+  authorship stays theirs. CI runs the checks only; nothing deploys yet.
+
+  .env.example is boilerplate: placeholders only, no real values. CI copies
+  it to .env, so anything the tests need goes in phpunit.xml.
+
+  Never swallow an exception: bind it, then report() or log it. Fix what
+  PHPStan reports rather than adding ignores or a baseline.
+
+  Done means CI would pass: composer ci:check, which runs composer test:lint,
+  npm run check, npm run types:check, composer analyse (Larastan at level 7,
+  then Sloppy against .sloppy-baseline.json) and the test suite.
+
+rules:
+  proposal:
+    - Say whether the change touches the public glossary, the admin screens, or both.
+    - Say whether it changes a public URL, the /v1 API, the widget or the import command, and how existing links and embeds keep working.
+    - Say whether it adds a migration or needs the live data changed or imported again.
+  tasks:
+    - Add or update tests in the same task as the behaviour they cover.
+    - Add any new interface text to lang/en/interface.php in the same task that uses it.
+    - End with a task that runs composer ci:check.
+    - No task commits, pushes or deploys. List those as steps for the maintainer.
+
+operations:
+  apply:
+    guidance:
+      - Run vendor/bin/pint on the PHP files you changed, never on the whole folder.
+      - Run npx vp check --fix after changing front-end, Markdown or JSON files.
+      - Leave every change uncommitted and say which files are ready to commit.
+  archive:
+    guidance:
+      - Leave the archive uncommitted for the maintainer to commit.

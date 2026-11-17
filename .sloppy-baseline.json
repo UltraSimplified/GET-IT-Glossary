@@ -1,0 +1,49 @@
+{
+    "schema": 1,
+    "tool": "sloppy",
+    "generated_at": "2026-11-17T10:04:02+00:00",
+    "score": 96,
+    "total": 5,
+    "entries": [
+        {
+            "id": "69a1f402213bc6f5",
+            "rule": "SL204",
+            "file": "app/Services/LegacyImport/LegacyGlossaryWriter.php",
+            "fingerprint": "LegacyGlossaryWriter::clear:DB.table.delete",
+            "count": 1,
+            "message": "LegacyGlossaryWriter::clear() writes to DB inside a loop (table()->delete())."
+        },
+        {
+            "id": "79207776d1e45847",
+            "rule": "SL204",
+            "file": "app/Services/LegacyImport/LegacyGlossaryWriter.php",
+            "fingerprint": "LegacyGlossaryWriter::continueNumbering:DB.table.max",
+            "count": 1,
+            "message": "LegacyGlossaryWriter::continueNumbering() queries DB inside a loop (table()->max())."
+        },
+        {
+            "id": "da0955a798f02517",
+            "rule": "SL204",
+            "file": "app/Services/LegacyImport/LegacyGlossaryWriter.php",
+            "fingerprint": "LegacyGlossaryWriter::repairMasterIds:DB.table.whereIn.update",
+            "count": 1,
+            "message": "LegacyGlossaryWriter::repairMasterIds() writes to DB inside a loop (table()->whereIn()->update())."
+        },
+        {
+            "id": "c7e35f3a4a3fd5a5",
+            "rule": "SL217",
+            "file": "database/migrations/0001_01_01_000000_create_users_table.php",
+            "fingerprint": "user_id",
+            "count": 1,
+            "message": "user_id is created with foreignId() but never constrained to the table it refers to."
+        },
+        {
+            "id": "eeddb3d7cc104816",
+            "rule": "SL217",
+            "file": "database/migrations/2026_11_16_000000_create_glossary_tables.php",
+            "fingerprint": "user_id",
+            "count": 1,
+            "message": "user_id is created with foreignId() but never constrained to the table it refers to."
+        }
+    ]
+}
