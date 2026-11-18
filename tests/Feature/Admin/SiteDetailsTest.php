@@ -172,4 +172,138 @@ class SiteDetailsTest extends TestCase
         Storage::disk('uploads')->assertMissing('site/old.png');
         $this->get('/')->assertInertia(fn (Assert $page) => $page->where('glossary.logo', '/assets/img/aimlogo.png'));
     }
+
+    /**
+     * Pictures already set on the site, with their files on the fake disk.
+     */
+    private function setPictures(string ...$fields): void
+    {
+        $paths = [];
+
+        foreach ($fields as $field) {
+            Storage::disk('uploads')->put("site/{$field}.png", 'png');
+            $paths[$field] = "/uploads/site/{$field}.png";
+        }
+
+        Site::query()->sole()->update($paths);
+    }
+
+    public function test_an_administrator_uploads_the_idgi_pictures(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->put('/site', $this->details([
+                'idgi_rest' => UploadedFile::fake()->image('rest.png', 480, 324),
+                'idgi_hover' => UploadedFile::fake()->image('hover.png', 480, 324),
+                'idgi_thanks' => UploadedFile::fake()->image('thanks.webp', 480, 324),
+            ]))
+            ->assertRedirect('/site')
+            ->assertSessionHasNoErrors();
+
+        $site = Site::query()->sole();
+
+        foreach ([$site->idgi_rest, $site->idgi_hover, $site->idgi_thanks] as $path) {
+            $this->assertNotNull($path);
+            $this->assertStringStartsWith('/uploads/site/', $path);
+            Storage::disk('uploads')->assertExists('site/'.basename($path));
+        }
+
+        $this->get('/site')->assertInertia(fn (Assert $page) => $page
+            ->where('site.idgi.rest', $site->idgi_rest)
+            ->where('site.idgi.thanks', $site->idgi_thanks));
+    }
+
+    public function test_an_svg_picture_is_refused(): void
+    {
+        $svg = UploadedFile::fake()->createWithContent('rest.svg', '<svg xmlns="http://www.w3.org/2000/svg"></svg>');
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->put('/site', $this->details(['idgi_rest' => $svg]))
+            ->assertSessionHasErrors(['idgi_rest' => 'The picture must be a PNG, JPEG, GIF or WebP image.']);
+
+        $this->assertNull(Site::query()->sole()->idgi_rest);
+    }
+
+    public function test_a_picture_over_2_mb_is_refused(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->put('/site', $this->details(['idgi_rest' => UploadedFile::fake()->image('rest.png')->size(3000)]))
+            ->assertSessionHasErrors(['idgi_rest' => 'The picture must be no larger than 2 MB.']);
+
+        $this->assertNull(Site::query()->sole()->idgi_rest);
+    }
+
+    public function test_a_thanks_picture_needs_a_resting_one(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->put('/site', $this->details(['idgi_thanks' => UploadedFile::fake()->image('thanks.png')]))
+            ->assertSessionHasErrors(['idgi_thanks' => 'Add the picture at rest first. The hover and thanks pictures are used alongside it.']);
+
+        $this->assertNull(Site::query()->sole()->idgi_thanks);
+        $this->assertSame([], Storage::disk('uploads')->allFiles('site'));
+    }
+
+    public function test_a_hover_picture_cannot_replace_a_resting_one_being_removed(): void
+    {
+        $this->setPictures('idgi_rest');
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->put('/site', $this->details(['remove_idgi_rest' => true, 'idgi_hover' => UploadedFile::fake()->image('hover.png')]))
+            ->assertSessionHasErrors('idgi_hover');
+
+        $this->assertSame('/uploads/site/idgi_rest.png', Site::query()->sole()->idgi_rest);
+    }
+
+    public function test_removing_the_hover_picture_leaves_the_others(): void
+    {
+        $this->setPictures('idgi_rest', 'idgi_hover', 'idgi_thanks');
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->put('/site', $this->details(['remove_idgi_hover' => true]))
+            ->assertSessionHasNoErrors();
+
+        $site = Site::query()->sole();
+        $this->assertNull($site->idgi_hover);
+        $this->assertSame('/uploads/site/idgi_rest.png', $site->idgi_rest);
+        $this->assertSame('/uploads/site/idgi_thanks.png', $site->idgi_thanks);
+        Storage::disk('uploads')->assertMissing('site/idgi_hover.png');
+    }
+
+    public function test_removing_the_resting_picture_removes_all_three(): void
+    {
+        $this->setPictures('idgi_rest', 'idgi_hover', 'idgi_thanks');
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->put('/site', $this->details(['remove_idgi_rest' => true]))
+            ->assertSessionHasNoErrors();
+
+        $site = Site::query()->sole();
+        $this->assertNull($site->idgi_rest);
+        $this->assertNull($site->idgi_hover);
+        $this->assertNull($site->idgi_thanks);
+        $this->assertSame([], Storage::disk('uploads')->allFiles('site'));
+    }
+
+    public function test_a_replaced_picture_loses_its_old_file(): void
+    {
+        $this->setPictures('idgi_rest');
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->put('/site', $this->details(['idgi_rest' => UploadedFile::fake()->image('new.png')]))
+            ->assertSessionHasNoErrors();
+
+        $site = Site::query()->sole();
+        $this->assertNotSame('/uploads/site/idgi_rest.png', $site->idgi_rest);
+        Storage::disk('uploads')->assertMissing('site/idgi_rest.png');
+        Storage::disk('uploads')->assertExists('site/'.basename((string) $site->idgi_rest));
+    }
+
+    public function test_someone_who_is_not_an_administrator_cannot_change_the_pictures(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->put('/site', $this->details(['idgi_rest' => UploadedFile::fake()->image('rest.png')]))
+            ->assertForbidden();
+
+        $this->assertNull(Site::query()->sole()->idgi_rest);
+        $this->assertSame([], Storage::disk('uploads')->allFiles('site'));
+    }
 }

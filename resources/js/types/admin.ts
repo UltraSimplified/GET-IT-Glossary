@@ -114,9 +114,15 @@ export type EditableSite = {
     tagline: string;
     locale: string;
     logo: string | null;
+    /** The "I don't get it" pictures; null where the site has none. */
+    idgi: IdgiPictures;
     font_stylesheet_url: string | null;
     font_families: string[];
 };
+
+export type IdgiPictureSlot = 'rest' | 'hover' | 'thanks';
+
+export type IdgiPictures = Record<IdgiPictureSlot, string | null>;
 
 export type Option = { value: string; label: string };
 
@@ -188,4 +194,16 @@ export type EditableTheme = {
 export type ThemeVariables = {
     light: Record<string, string>;
     dark: Record<string, string> | null;
+};
+
+/** What a reader said after pressing "I don't get it", as editors see it. */
+export type IdgiReply = {
+    id: number;
+    message: string;
+    date: string | null;
+    datetime: string | null;
+    version: number;
+    /** About a version older than the one being edited. */
+    earlier: boolean;
+    handled: { by: string; date: string | null } | null;
 };

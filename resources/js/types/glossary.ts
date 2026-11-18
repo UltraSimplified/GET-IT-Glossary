@@ -7,6 +7,8 @@ export type GlossaryShared = {
     title: string;
     tagline: string;
     logo: string;
+    /** The site's "I don't get it" pictures, or null for the built-in bubbles. */
+    idgi: { rest: string; hover: string; thanks: string } | null;
     locale: string;
     letters: string[];
     footer: FooterColumn[];

@@ -64,6 +64,39 @@ class SharedSitePropsTest extends TestCase
             ->where('theme.has_dark', false));
     }
 
+    public function test_without_a_resting_picture_the_bubbles_show(): void
+    {
+        Site::query()->sole()->update(['idgi_rest' => null, 'idgi_thanks' => '/uploads/site/thanks.png']);
+
+        $this->get('/')->assertInertia(fn (Assert $page) => $page->where('glossary.idgi', null));
+    }
+
+    public function test_a_resting_picture_stands_in_for_the_others(): void
+    {
+        Site::query()->sole()->update(['idgi_rest' => '/uploads/site/rest.png', 'idgi_hover' => null, 'idgi_thanks' => null]);
+
+        $this->get('/')->assertInertia(fn (Assert $page) => $page->where('glossary.idgi', [
+            'rest' => '/uploads/site/rest.png',
+            'hover' => '/uploads/site/rest.png',
+            'thanks' => '/uploads/site/rest.png',
+        ]));
+    }
+
+    public function test_all_three_pictures_are_shared(): void
+    {
+        Site::query()->sole()->update([
+            'idgi_rest' => '/uploads/site/rest.png',
+            'idgi_hover' => '/uploads/site/hover.png',
+            'idgi_thanks' => '/uploads/site/thanks.png',
+        ]);
+
+        $this->get('/')->assertInertia(fn (Assert $page) => $page->where('glossary.idgi', [
+            'rest' => '/uploads/site/rest.png',
+            'hover' => '/uploads/site/hover.png',
+            'thanks' => '/uploads/site/thanks.png',
+        ]));
+    }
+
     public function test_the_widget_is_titled_with_the_site_name(): void
     {
         Site::query()->sole()->update(['name' => 'Generation R']);

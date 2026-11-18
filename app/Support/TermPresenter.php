@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\IdgiReply;
 use App\Models\Term;
 
 /**
@@ -80,6 +81,37 @@ class TermPresenter
                 'hits' => $term->hits,
             ],
         ];
+    }
+
+    /**
+     * What readers said after pressing "I don't get it", for every version
+     * of the term: new replies first, then those dealt with, newest first
+     * within each.
+     *
+     * @return list<array{id: int, message: string, date: string|null, datetime: string|null, version: int, earlier: bool, handled: array{by: string, date: string|null}|null}>
+     */
+    public static function idgiReplies(Term $term): array
+    {
+        $replies = IdgiReply::query()
+            ->where('master_id', $term->master_id)
+            ->with(['term:id,version', 'handler:id,first_name,last_name'])
+            ->orderByRaw('handled_at is not null')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
+
+        return array_values($replies->map(fn (IdgiReply $reply): array => [
+            'id' => $reply->id,
+            'message' => $reply->message,
+            'date' => $reply->created_at?->diffForHumans(),
+            'datetime' => $reply->created_at?->toIso8601String(),
+            'version' => $reply->term->version,
+            'earlier' => $reply->term->version < $term->version,
+            'handled' => $reply->handled_at === null ? null : [
+                'by' => $reply->handler !== null ? $reply->handler->name : __('Former user'),
+                'date' => $reply->handled_at->diffForHumans(),
+            ],
+        ])->all());
     }
 
     /**

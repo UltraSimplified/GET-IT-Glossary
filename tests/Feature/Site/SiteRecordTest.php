@@ -41,6 +41,15 @@ class SiteRecordTest extends TestCase
         $this->assertSame('Klartekst definisjoner av helseforskningsvilkår', $site->tagline);
     }
 
+    public function test_a_new_site_has_no_idgi_pictures_of_its_own(): void
+    {
+        $site = Site::query()->sole();
+
+        $this->assertNull($site->idgi_rest);
+        $this->assertNull($site->idgi_hover);
+        $this->assertNull($site->idgi_thanks);
+    }
+
     public function test_missing_settings_give_the_get_it_defaults(): void
     {
         DB::table('sites')->delete();

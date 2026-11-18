@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ChooseThemeController;
+use App\Http\Controllers\Admin\IdgiReplyController as AdminIdgiReplyController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\PronunciationUploadController;
 use App\Http\Controllers\Admin\SiteController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\GlossaryController;
 use App\Http\Controllers\IdgiController;
+use App\Http\Controllers\IdgiReplyController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WidgetController;
@@ -51,6 +53,7 @@ Route::middleware('throttle:6,1')->group(function () {
 });
 
 Route::post('idgi/{term}', IdgiController::class)->middleware('throttle:10,1')->name('idgi');
+Route::post('idgi/{term}/reply', IdgiReplyController::class)->middleware('throttle:6,1')->name('idgi.reply');
 
 Route::get('sitemap', SitemapController::class)->name('sitemap');
 
@@ -98,6 +101,10 @@ Route::middleware('auth')->group(function () {
     Route::get('terms/{term}', [AdminTermController::class, 'show'])->name('terms.show');
     Route::get('terms/{term}/edit', [AdminTermController::class, 'edit'])->name('terms.edit');
     Route::put('terms/{term}', [AdminTermController::class, 'update'])->name('terms.update');
+
+    // What readers said after pressing "I don't get it" (IdgiReplyPolicy decides who).
+    Route::patch('idgi-replies/{reply}', [AdminIdgiReplyController::class, 'update'])->name('idgi-replies.update');
+    Route::delete('idgi-replies/{reply}', [AdminIdgiReplyController::class, 'destroy'])->name('idgi-replies.destroy');
 
     Route::post('upload', UploadController::class)->middleware('can:upload')->name('upload');
     Route::post('upload/pronunciation', PronunciationUploadController::class)->middleware('can:upload')->name('upload.pronunciation');

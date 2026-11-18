@@ -2,6 +2,7 @@
 import { Link, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import Field from '@/components/admin/Field.vue';
+import IdgiReplies from '@/components/admin/IdgiReplies.vue';
 import IdgiScore from '@/components/admin/IdgiScore.vue';
 import PronunciationRecorder from '@/components/admin/PronunciationRecorder.vue';
 import RichTextEditor from '@/components/admin/RichTextEditor.vue';
@@ -14,6 +15,7 @@ import { useTranslations } from '@/composables/useTranslations';
 import type {
     EditableTerm,
     EditorChoices,
+    IdgiReply,
     TermFields,
     TermStatus,
     VersionMeta,
@@ -33,6 +35,8 @@ const props = defineProps<{
     statuses: TermStatus[];
     /** Null when the person editing is not an administrator. */
     editors: EditorChoices | null;
+    /** What readers said after pressing "I don't get it" (editing only). */
+    replies?: IdgiReply[];
 }>();
 
 const { t } = useTranslations();
@@ -537,6 +541,7 @@ const errorCount = computed(() => Object.keys(form.errors).length);
             </section>
 
             <IdgiScore v-if="meta?.idgi" :score="meta.idgi" />
+            <IdgiReplies v-if="replies" :replies="replies" />
 
             <section class="space-y-4 rounded-lg border bg-card p-4">
                 <Field

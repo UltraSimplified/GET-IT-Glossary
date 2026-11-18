@@ -120,6 +120,8 @@ class TermController extends TermAdminController
             ],
             'meta' => TermPresenter::versionMeta($term),
             'editors' => $user->is_admin ? $this->editorOptions($term) : null,
+            // What readers said after pressing "I don't get it", for every version.
+            'replies' => fn (): array => TermPresenter::idgiReplies($term),
         ]);
     }
 

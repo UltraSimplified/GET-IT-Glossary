@@ -101,17 +101,22 @@ watch(
     <template v-else>
         <Head :title="`“${term.term}”`" />
 
+        <!-- The single column on narrow screens never grows past the screen,
+             whatever the content needs. -->
         <article
-            class="grid gap-x-16 gap-y-12 lg:grid-cols-[minmax(0,44rem)_minmax(0,1fr)]"
+            class="grid grid-cols-[minmax(0,1fr)] gap-x-16 gap-y-12 lg:grid-cols-[minmax(0,44rem)_minmax(0,1fr)]"
         >
             <div>
                 <header>
-                    <div class="flex items-start gap-4">
+                    <!-- When a word of the term doesn't fit beside the Edit link,
+                         the link moves below it. A word too long for the screen
+                         breaks rather than making the page scroll sideways. -->
+                    <div class="flex flex-wrap items-start gap-x-4 gap-y-3">
                         <div
-                            class="flex flex-1 flex-wrap items-center gap-x-3 gap-y-2"
+                            class="flex max-w-full flex-1 flex-wrap items-center gap-x-3 gap-y-2"
                         >
                             <h1
-                                class="text-3xl font-bold text-balance text-ink md:text-4xl"
+                                class="max-w-full text-3xl font-bold text-balance wrap-break-word text-ink md:text-4xl"
                             >
                                 <a
                                     v-if="term.do_not_use"
@@ -172,7 +177,7 @@ watch(
                         <Link
                             v-if="canEdit"
                             :href="`/terms/${term.id}/edit`"
-                            class="mt-2 inline-flex shrink-0 items-center gap-1.5 rounded-md border bg-card px-3 py-1.5 text-sm font-semibold text-ink hover:bg-brand-soft"
+                            class="mt-2 ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-md border bg-card px-3 py-1.5 text-sm font-semibold text-ink hover:bg-brand-soft"
                         >
                             <SquarePen class="size-4" aria-hidden="true" />
                             {{ t('edit') }}

@@ -8,6 +8,7 @@ import { useTranslations } from '@/composables/useTranslations';
 import type {
     EditableTerm,
     EditorChoices,
+    IdgiReply,
     TermStatus,
     VersionMeta,
 } from '@/types';
@@ -20,6 +21,7 @@ defineProps<{
     tagOptions: string[];
     statuses: TermStatus[];
     editors: EditorChoices | null;
+    replies: IdgiReply[];
 }>();
 
 const { t } = useTranslations();
@@ -58,6 +60,7 @@ const { t } = useTranslations();
         :key="term.id"
         :term="term"
         :meta="meta"
+        :replies="replies"
         :tag-options="tagOptions"
         :statuses="statuses"
         :editors="editors"

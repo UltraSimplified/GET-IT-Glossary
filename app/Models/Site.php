@@ -19,13 +19,16 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $tagline
  * @property string $locale
  * @property string|null $logo Public URL path of the site's own logo.
+ * @property string|null $idgi_rest Public path of the "I don't get it" picture at rest.
+ * @property string|null $idgi_hover The picture on hover or focus, if not the resting one.
+ * @property string|null $idgi_thanks The picture after the click, if not the resting one.
  * @property string|null $font_stylesheet_url
  * @property list<string>|null $font_families Families the font stylesheet declares.
  * @property string $theme_key
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  */
-#[Fillable(['name', 'tagline', 'locale', 'logo', 'font_stylesheet_url', 'font_families', 'theme_key'])]
+#[Fillable(['name', 'tagline', 'locale', 'logo', 'idgi_rest', 'idgi_hover', 'idgi_thanks', 'font_stylesheet_url', 'font_families', 'theme_key'])]
 class Site extends Model
 {
     /** @use HasFactory<SiteFactory> */
@@ -57,6 +60,26 @@ class Site extends Model
         $host = is_string($url) ? parse_url($url, PHP_URL_HOST) : null;
 
         return is_string($scheme) && is_string($host) ? $scheme.'://'.$host : null;
+    }
+
+    /**
+     * The "I don't get it" pictures the button shows, or null when the site
+     * has no resting picture and the built-in bubbles show instead. A
+     * missing hover or thanks picture falls back to the resting one.
+     *
+     * @return array{rest: string, hover: string, thanks: string}|null
+     */
+    public function idgiPictures(): ?array
+    {
+        if ($this->idgi_rest === null) {
+            return null;
+        }
+
+        return [
+            'rest' => $this->idgi_rest,
+            'hover' => $this->idgi_hover ?? $this->idgi_rest,
+            'thanks' => $this->idgi_thanks ?? $this->idgi_rest,
+        ];
     }
 
     /**

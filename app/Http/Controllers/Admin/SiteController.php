@@ -16,11 +16,12 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * The site's details: name, tagline, language, logo and font stylesheet.
+ * The site's details: name, tagline, language, logo, font stylesheet and
+ * the "I don't get it" pictures.
  */
 class SiteController extends Controller
 {
-    private const string LOGO_FOLDER = 'site';
+    private const string UPLOAD_FOLDER = 'site';
 
     public function edit(CurrentSite $current): Response
     {
@@ -32,6 +33,11 @@ class SiteController extends Controller
                 'tagline' => $site->tagline,
                 'locale' => $site->locale,
                 'logo' => $site->logo,
+                'idgi' => [
+                    'rest' => $site->idgi_rest,
+                    'hover' => $site->idgi_hover,
+                    'thanks' => $site->idgi_thanks,
+                ],
                 'font_stylesheet_url' => $site->font_stylesheet_url,
                 'font_families' => $site->fontFamilies(),
             ],
@@ -53,7 +59,8 @@ class SiteController extends Controller
             'font_stylesheet_url' => $request->filled('font_stylesheet_url') ? $request->string('font_stylesheet_url')->trim()->value() : null,
         ]);
 
-        $this->updateLogo($site, $request->file('logo'), $request->boolean('remove_logo'));
+        $this->replaceUpload($site, 'logo', $request->file('logo'), $request->boolean('remove_logo'));
+        $this->updateIdgiPictures($site, $request);
 
         $fontsRead = $this->updateFontFamilies($site, $readFonts, $previousUrl);
 
@@ -67,17 +74,34 @@ class SiteController extends Controller
     }
 
     /**
-     * A new upload replaces the logo; removing it lets the theme's logo show.
+     * The "I don't get it" pictures. Without a resting picture the other two
+     * have nothing to stand in for, so removing it removes them as well.
      */
-    private function updateLogo(Site $site, mixed $upload, bool $remove): void
+    private function updateIdgiPictures(Site $site, SiteRequest $request): void
+    {
+        $clearAll = $request->boolean('remove_idgi_rest') && ! $request->hasFile('idgi_rest');
+
+        foreach (SiteRequest::IDGI_PICTURES as $field) {
+            $remove = $clearAll || $request->boolean('remove_'.$field);
+            $this->replaceUpload($site, $field, $request->file($field), $remove);
+        }
+    }
+
+    /**
+     * A new upload replaces the picture in that attribute; removing it lets
+     * the default (the theme's logo, the built-in bubbles) show.
+     *
+     * @param  'logo'|'idgi_rest'|'idgi_hover'|'idgi_thanks'  $attribute
+     */
+    private function replaceUpload(Site $site, string $attribute, mixed $upload, bool $remove): void
     {
         if (! $remove && ! $upload instanceof UploadedFile) {
             return;
         }
 
-        // Only logos uploaded here are deleted; a path from GLOSSARY_LOGO is left alone.
-        UploadedLogos::delete($site->logo, self::LOGO_FOLDER);
-        $site->logo = $upload instanceof UploadedFile ? UploadedLogos::store($upload, self::LOGO_FOLDER) : null;
+        // Only files uploaded here are deleted; a path from GLOSSARY_LOGO is left alone.
+        UploadedLogos::delete($site->{$attribute}, self::UPLOAD_FOLDER);
+        $site->{$attribute} = $upload instanceof UploadedFile ? UploadedLogos::store($upload, self::UPLOAD_FOLDER) : null;
     }
 
     /**

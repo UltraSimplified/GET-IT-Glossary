@@ -5,6 +5,9 @@
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
+# Files uploaded on a site (logos, pictures, recordings, images in terms) belong to
+# that site, not to the code, and may be licensed to it alone.
+/public/uploads
 /storage/*.key
 /storage/pail
 /resources/js/actions

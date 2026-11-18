@@ -13,6 +13,7 @@ This is a rebuild of the original Laravel 5 site on Laravel 13, with Inertia and
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [The site and its look](#the-site-and-its-look)
+- ["I don't get it"](#i-dont-get-it)
 - [Importing the live glossary](#importing-the-live-glossary)
 - [Development](#development)
 - [Where things are](#where-things-are)
@@ -117,6 +118,22 @@ Every page then loads that stylesheet from the service's own servers, which is a
 
 Adobe Fonts only serves a kit to the domains listed in it. Whenever the glossary runs at a new address (a new production domain, a staging site or a local `.test` address), add that domain to the kit's web project in Adobe Fonts, in its list of domains (under **Web Projects**). Until then, pages fall back to the theme's open font; for classic that is Source Serif 4.
 
+## "I don't get it"
+
+Every term page ends with "Still don't get it?" and the "I don't get it" button. Pressing it adds one to the version's "I don't get it" count, and editors see that count as a share of the term's views: on the term list, the edit screen and the version comparison. Each new version starts its count again from zero.
+
+After pressing the button, readers can say in a few words what didn't make sense. That's optional, and a reply is anonymous: only the reader's words, the version they were reading and the date are kept, with no name, email or IP address, and the form asks them not to include personal details. A reply is only accepted straight after a click on that version, once per click, and at most six a minute from one visitor. A hidden field catches automated spam.
+
+Replies appear on the term's edit screen, below the "I don't get it" score, for every version of the term. Replies about an earlier version are marked as such. Anyone who can edit the term can mark a reply dealt with, which keeps it as a record under "Dealt with", or mark it new again. Administrators can also delete a reply, for spam. Replies never appear on public pages, in the API or in the widget.
+
+### The button's pictures
+
+Out of the box the button shows speech bubbles: "I don't get it" at rest, "Click & tell us" on hover or keyboard focus, and "Thanks!" after the click. They are drawn in the theme's colours and heading font, and their words are interface text, so each language edition can translate them.
+
+Administrators can replace them on the Site screen, under **"I don't get it" pictures**, with three pictures of their own: at rest, on hover and after the click. Only the picture at rest is needed; the other two fall back to it. Pictures look best at 480 × 324 pixels on a white or clear background, as PNG, JPEG, GIF or WebP up to 2 MB (SVG is refused). Removing the picture at rest removes all three and brings the bubbles back.
+
+The monkey pictures the original GET-IT sites used are licensed to Minervation for its own sites, so they are not part of this repository. A site licensed to use them uploads them once on the Site screen: `IDGI-off.png` at rest, `IDGI-click.png` on hover and `IDGI-thanks.png` after the click.
+
 ## Importing the live glossary
 
 `glossary:import` loads a database export of the original site, plain or gzipped, into whichever database `.env` points at. It keeps every record's id, so term versions, comments, editor assignments and "updated by" names stay connected.
@@ -125,7 +142,7 @@ Adobe Fonts only serves a kit to the domains listed in it. Whenever the glossary
 php artisan glossary:import path/to/export.sql.gz
 ```
 
-It replaces all users, terms, pages and comments, and asks before doing so (`--force` skips the question). The search log can run to millions of rows, so it is left out unless you add `--searches`.
+It replaces all users, terms, pages and comments, and asks before doing so (`--force` skips the question). Readers' "I don't get it" replies belong to the terms they were sent about, so they are removed too. The search log can run to millions of rows, so it is left out unless you add `--searches`.
 
 Export from phpMyAdmin with **Include column names in every INSERT statement** ticked, or use `mysqldump --complete-insert`.
 
@@ -170,6 +187,7 @@ Wayfinder writes typed route helpers to `resources/js/routes` and `resources/js/
 | `resources/themes`           | The built-in themes (`classic`, `aim`, `ypags`) as JSON                 |
 | `resources/js/pages`         | One Vue component per page; `admin/` holds the management screens       |
 | `lang/`                      | Interface text in each language                                         |
+| `public/uploads`             | Files uploaded on a site; ignored by Git, as they belong to the site    |
 
 ## Licence
 

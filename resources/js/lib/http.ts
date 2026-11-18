@@ -3,6 +3,17 @@
  * (search suggestions, "I don't get it", image uploads).
  */
 
+/** A request the server refused, with its status code and its message. */
+export class HttpError extends Error {
+    constructor(
+        message: string,
+        readonly status: number,
+    ) {
+        super(message);
+        this.name = 'HttpError';
+    }
+}
+
 function xsrfToken(): string {
     const match = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
 
@@ -24,7 +35,7 @@ async function parse<T>(response: Response): Promise<T> {
             // The response had no JSON body; keep the generic message.
         }
 
-        throw new Error(message);
+        throw new HttpError(message, response.status);
     }
 
     return (await response.json()) as T;

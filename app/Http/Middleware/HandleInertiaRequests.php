@@ -58,6 +58,7 @@ class HandleInertiaRequests extends Middleware
                 'title' => $current->site()->name,
                 'tagline' => $current->site()->tagline,
                 'logo' => $current->site()->logo ?? $current->theme()->logo() ?? '',
+                'idgi' => $current->site()->idgiPictures(),
                 'locale' => app()->getLocale(),
                 'letters' => Glossary::letters(),
                 'footer' => Glossary::footer(),
