@@ -6,6 +6,7 @@ use App\Models\Page;
 use App\Models\Term;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 /**
@@ -51,6 +52,23 @@ class ApiAndEmbedTest extends TestCase
         $this->get('/v1/hit/unknown')->assertOk()->assertContent('0');
 
         $this->assertSame(10, $term->fresh()->hits);
+    }
+
+    public function test_names_stored_with_a_trailing_space_are_still_found(): void
+    {
+        // A few names imported from the original site end in a space. Its MySQL
+        // ignored that when comparing, and the WordPress plugin relies on it.
+        $term = Term::factory()->create(['term' => 'sponsor bias ', 'definition' => 'Bias towards the [sponsor].', 'hits' => 4]);
+
+        $this->get('/v1/terms/sponsor+bias')
+            ->assertOk()
+            ->assertExactJson([['term' => 'sponsor bias ', 'definition' => 'Bias towards the [sponsor].']]);
+        $this->get('/v1/terms/Sponsor+Bias')->assertJsonCount(1);
+        $this->get('/v1/hit/sponsor+bias')->assertContent('5');
+
+        $this->get('/term/sponsor+bias')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page->where('term.id', $term->id));
     }
 
     public function test_the_terms_list_and_widget_render_published_terms(): void

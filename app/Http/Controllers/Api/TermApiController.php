@@ -36,7 +36,7 @@ class TermApiController extends Controller
         $query = TermLinker::unslug($term);
 
         $terms = Term::query()->live()
-            ->where(fn ($q) => $q->where('term', $query)->orWhereRaw('LOWER(term) = ?', [$query]))
+            ->named($query)
             ->limit(1)
             ->get(['term', 'definition']);
 
@@ -52,7 +52,7 @@ class TermApiController extends Controller
         $query = TermLinker::unslug($query);
 
         $term = Term::query()->live()
-            ->where(fn ($q) => $q->where('term', $query)->orWhereRaw('LOWER(term) = ?', [$query]))
+            ->named($query)
             ->first();
 
         return $this->open(response((string) ($term ? $term->recordHit() : 0)));

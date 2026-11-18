@@ -31,7 +31,7 @@ class CommentController extends Controller
         $user = $request->user();
 
         $found = Term::query()->live()
-            ->where(fn ($q) => $q->where('term', $query)->orWhereRaw('LOWER(term) = ?', [$query]))
+            ->named($query)
             ->first()
             ?? Term::query()->live()->where('synonyms', 'LIKE', '%'.$query.'%')->first();
 

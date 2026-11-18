@@ -118,6 +118,21 @@ class Term extends Model
     }
 
     /**
+     * Terms with this name, whatever its case. Spaces around the stored name
+     * are ignored too: a few names imported from the original site end in a
+     * space, which MySQL's old collation overlooked when comparing.
+     *
+     * @param  Builder<Term>  $query
+     */
+    #[Scope]
+    protected function named(Builder $query, string $name): void
+    {
+        $name = mb_strtolower(trim($name));
+
+        $query->where(fn (Builder $q) => $q->where('term', $name)->orWhereRaw('LOWER(TRIM(term)) = ?', [$name]));
+    }
+
+    /**
      * The newest version of each term, whatever its status.
      *
      * @param  Builder<Term>  $query
@@ -181,9 +196,7 @@ class Term extends Model
             return null;
         }
 
-        $exact = self::query()->live()
-            ->where(fn (Builder $q) => $q->where('term', $query)->orWhereRaw('LOWER(term) = ?', [$query]))
-            ->first();
+        $exact = self::query()->live()->named($query)->first();
 
         if ($exact) {
             return $exact;
